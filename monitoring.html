@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolyStoreX 2.0 Monitoring - Observability and metrics dashboard">
+    <title>Monitoring | PolyStoreX 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1>Monitoring</h1>
+                        <p>Observability metrics and incident timeline</p>
+                    </div>
+                    <div class="flex gap-sm">
+                        <select class="form-input" style="width: auto;" id="time-range">
+                            <option value="1h">Last 1 hour</option>
+                            <option value="6h">Last 6 hours</option>
+                            <option value="24h" selected>Last 24 hours</option>
+                            <option value="7d">Last 7 days</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="Monitoring.refresh()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Metrics Grid -->
+                <div class="grid grid-4 mb-xl">
+                    <!-- Avg Latency -->
+                    <div class="card metric-card">
+                        <div class="card-header">
+                            <span class="card-title">Avg Latency</span>
+                            <div class="metric-icon blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-value" id="metric-latency">12ms</div>
+                        <div class="simple-chart" id="chart-latency" style="height: 60px;"></div>
+                    </div>
+
+                    <!-- Cache Hit Ratio -->
+                    <div class="card metric-card">
+                        <div class="card-header">
+                            <span class="card-title">Cache Hit Ratio</span>
+                            <div class="metric-icon green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-value" id="metric-cache">94.2%</div>
+                        <div class="simple-chart" id="chart-cache" style="height: 60px;"></div>
+                    </div>
+
+                    <!-- Sync Status -->
+                    <div class="card metric-card">
+                        <div class="card-header">
+                            <span class="card-title">Sync Status</span>
+                            <div class="metric-icon orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10" />
+                                    <polyline points="1 20 1 14 7 14" />
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-value" id="metric-sync">4/4</div>
+                        <div class="card-footer" style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
+                            <span class="badge badge-success">All Synced</span>
+                        </div>
+                    </div>
+
+                    <!-- Error Rate -->
+                    <div class="card metric-card">
+                        <div class="card-header">
+                            <span class="card-title">Error Rate</span>
+                            <div class="metric-icon red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                    <line x1="12" y1="9" x2="12" y2="13" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="card-value" id="metric-errors">0.12%</div>
+                        <div class="simple-chart" id="chart-errors" style="height: 60px;"></div>
+                    </div>
+                </div>
+
+                <!-- Database Performance -->
+                <div class="card mb-xl">
+                    <div class="card-header">
+                        <span class="card-title">Database Performance</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Database</th>
+                                    <th>Status</th>
+                                    <th>Latency (p50)</th>
+                                    <th>Latency (p99)</th>
+                                    <th>Throughput</th>
+                                    <th>Error Rate</th>
+                                    <th>Connections</th>
+                                </tr>
+                            </thead>
+                            <tbody id="perf-table">
+                                <tr>
+                                    <td class="flex items-center gap-sm">
+                                        <span class="status-dot healthy"></span>
+                                        PostgreSQL
+                                    </td>
+                                    <td><span class="badge badge-success">Healthy</span></td>
+                                    <td>8ms</td>
+                                    <td>45ms</td>
+                                    <td>1,245 req/s</td>
+                                    <td>0.02%</td>
+                                    <td>24/100</td>
+                                </tr>
+                                <tr>
+                                    <td class="flex items-center gap-sm">
+                                        <span class="status-dot healthy"></span>
+                                        MongoDB
+                                    </td>
+                                    <td><span class="badge badge-success">Healthy</span></td>
+                                    <td>12ms</td>
+                                    <td>68ms</td>
+                                    <td>856 req/s</td>
+                                    <td>0.05%</td>
+                                    <td>18/50</td>
+                                </tr>
+                                <tr>
+                                    <td class="flex items-center gap-sm">
+                                        <span class="status-dot healthy"></span>
+                                        Redis
+                                    </td>
+                                    <td><span class="badge badge-success">Healthy</span></td>
+                                    <td>0.8ms</td>
+                                    <td>3ms</td>
+                                    <td>5,420 ops/s</td>
+                                    <td>0.00%</td>
+                                    <td>42/200</td>
+                                </tr>
+                                <tr>
+                                    <td class="flex items-center gap-sm">
+                                        <span class="status-dot healthy"></span>
+                                        Neo4j
+                                    </td>
+                                    <td><span class="badge badge-success">Healthy</span></td>
+                                    <td>18ms</td>
+                                    <td>95ms</td>
+                                    <td>234 req/s</td>
+                                    <td>0.08%</td>
+                                    <td>8/25</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Incident Timeline -->
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Incident Timeline</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="timeline" id="incident-timeline">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Active Alerts</span>
+                            <span class="badge badge-success" id="alert-count">0 Active</span>
+                        </div>
+                        <div class="panel-body" id="alerts-panel">
+                            <div class="flex items-center justify-center p-lg text-muted">
+                                <div class="text-center">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1" style="opacity: 0.3; margin: 0 auto 1rem;">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                        <polyline points="22 4 12 14.01 9 11.01" />
+                                    </svg>
+                                    <p class="text-sm">No active alerts</p>
+                                    <p class="text-xs">All systems operating normally</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/monitoring.js"></script>
+</body>
+
+</html>

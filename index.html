@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="PolyStoreX 2.0 - Intelligent orchestration and observability platform for polyglot persistence systems">
+  <title>Login | PolyStoreX 2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <!-- Header -->
+      <div class="login-header">
+        <div class="login-logo">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="12" height="12" rx="2" fill="currentColor" opacity="0.8" />
+            <rect x="18" y="2" width="12" height="12" rx="2" fill="currentColor" opacity="0.6" />
+            <rect x="2" y="18" width="12" height="12" rx="2" fill="currentColor" opacity="0.6" />
+            <rect x="18" y="18" width="12" height="12" rx="2" fill="currentColor" opacity="0.4" />
+            <circle cx="16" cy="16" r="4" fill="currentColor" />
+          </svg>
+          <h1>PolyStoreX</h1>
+        </div>
+        <p class="login-subtitle">Polyglot Persistence Orchestration Platform</p>
+      </div>
+
+      <!-- Error Message -->
+      <div id="error-message" class="badge badge-error w-full mb-md"
+        style="display: none; justify-content: center; padding: 0.75rem;">
+        <span id="error-text"></span>
+      </div>
+
+      <!-- Social Login -->
+      <button class="social-btn" onclick="handleGoogleLogin()">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4"
+            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853"
+            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05"
+            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="#EA4335"
+            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- Divider -->
+      <div class="login-divider">or continue with</div>
+
+      <!-- Login Method Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" data-tab="email" onclick="switchLoginTab('email')">Email</button>
+        <button class="login-tab" data-tab="phone" onclick="switchLoginTab('phone')">Phone</button>
+      </div>
+
+      <!-- Email Login Form -->
+      <form id="email-form" class="login-form active" onsubmit="handleEmailLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="you@company.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-full" id="email-submit-btn">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Phone Login Form -->
+      <form id="phone-form" class="login-form" onsubmit="handlePhoneLogin(event)">
+        <div id="phone-step-1">
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 000-0000" required>
+          </div>
+          <button type="button" class="btn btn-primary btn-lg w-full" onclick="sendOTP()">
+            Send OTP
+          </button>
+        </div>
+        <div id="phone-step-2" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="otp">Verification Code</label>
+            <input type="text" id="otp" class="form-input" placeholder="Enter 6-digit code" maxlength="6" required>
+            <p class="text-muted text-xs mt-sm">Enter any 6-digit code for demo</p>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-full">
+            Verify & Sign In
+          </button>
+          <button type="button" class="btn btn-ghost w-full mt-sm" onclick="resetPhoneForm()">
+            Use different number
+          </button>
+        </div>
+      </form>
+
+      <!-- Footer -->
+      <p class="text-muted text-xs text-center mt-lg">
+        By signing in, you agree to our Terms of Service and Privacy Policy
+      </p>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Check if already authenticated
+    document.addEventListener('DOMContentLoaded', () => {
+      Auth.redirectIfAuthenticated();
+    });
+
+    // Switch between email and phone login tabs
+    function switchLoginTab(tab) {
+      // Update tab buttons
+      document.querySelectorAll('.login-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      // Show/hide forms
+      document.getElementById('email-form').classList.toggle('active', tab === 'email');
+      document.getElementById('phone-form').classList.toggle('active', tab === 'phone');
+
+      // Clear any errors
+      hideError();
+    }
+
+    // Handle Google login
+    async function handleGoogleLogin() {
+      try {
+        showLoading(true);
+        await Auth.loginWithGoogle();
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Handle email/password login
+    async function handleEmailLogin(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        showLoading(true);
+        await Auth.loginWithEmail(email, password);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Send OTP to phone
+    async function sendOTP() {
+      const phone = document.getElementById('phone').value;
+
+      try {
+        showLoading(true);
+        await Auth.sendOTP(phone);
+
+        // Show OTP input step
+        document.getElementById('phone-step-1').style.display = 'none';
+        document.getElementById('phone-step-2').style.display = 'block';
+        document.getElementById('otp').focus();
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Handle phone/OTP login
+    async function handlePhoneLogin(event) {
+      event.preventDefault();
+
+      const otp = document.getElementById('otp').value;
+
+      try {
+        showLoading(true);
+        await Auth.verifyOTP(otp);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Reset phone form to step 1
+    function resetPhoneForm() {
+      document.getElementById('phone-step-1').style.display = 'block';
+      document.getElementById('phone-step-2').style.display = 'none';
+      document.getElementById('phone').value = '';
+      document.getElementById('otp').value = '';
+      hideError();
+    }
+
+    // Show error message
+    function showError(message) {
+      const errorEl = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      errorText.textContent = message;
+      errorEl.style.display = 'flex';
+    }
+
+    // Hide error message
+    function hideError() {
+      document.getElementById('error-message').style.display = 'none';
+    }
+
+    // Show/hide loading state
+    function showLoading(loading) {
+      const buttons = document.querySelectorAll('.btn-primary, .social-btn');
+      buttons.forEach(btn => {
+        btn.disabled = loading;
+        if (loading) {
+          btn.style.opacity = '0.7';
+        } else {
+          btn.style.opacity = '1';
+        }
+      });
+    }
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBrB-3pQ0VassRO0pbZHKtrFwX8guxbAGA",
+      authDomain: "polystorex.firebaseapp.com",
+      projectId: "polystorex",
+      storageBucket: "polystorex.firebasestorage.app",
+      messagingSenderId: "270041700160",
+      appId: "1:270041700160:web:b50da48bafee8e5a064ca5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Expose to your existing Auth object
+    window.firebaseAuth = auth;
+    window.firebaseProviders = {
+      google: new GoogleAuthProvider(),
+      signInWithPopup,
+      signInWithEmailAndPassword
+    };
+  </script>
+
+</body>
+
+</html>

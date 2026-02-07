@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolyStoreX 2.0 Settings - System controls and user preferences">
+    <title>Settings | PolyStoreX 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Settings</h1>
+                <p>System controls and user preferences</p>
+            </header>
+
+            <div class="page-content">
+                <!-- User Profile Section -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <h2 class="settings-section-title">User Profile</h2>
+                        <p class="settings-section-description">Manage your account information</p>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <div class="flex items-center gap-md">
+                                <div class="user-avatar" style="width: 48px; height: 48px; font-size: 1rem;"
+                                    id="profile-avatar">DU</div>
+                                <div>
+                                    <h4 id="profile-name">Demo User</h4>
+                                    <p id="profile-email">demo@polystorex.io</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary">Edit Profile</button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Role</h4>
+                            <p id="profile-role">Platform Engineer</p>
+                        </div>
+                        <span class="badge badge-info">Admin</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Session</h4>
+                            <p id="session-info">Active since login</p>
+                        </div>
+                        <button class="btn btn-danger" onclick="Auth.logout()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Settings -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <h2 class="settings-section-title">Simulation Settings</h2>
+                        <p class="settings-section-description">Control system simulation behavior for testing</p>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>High Load Simulation</h4>
+                            <p>Simulate high traffic conditions to test system behavior</p>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-high-load"
+                                onchange="Settings.toggleHighLoad(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Random Failures</h4>
+                            <p>Randomly inject failures to test resilience</p>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-random-failures"
+                                onchange="Settings.toggleRandomFailures(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Latency Injection</h4>
+                            <p>Add artificial latency to database operations</p>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-latency" onchange="Settings.toggleLatency(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Database Controls -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <h2 class="settings-section-title">Database Controls</h2>
+                        <p class="settings-section-description">Enable or disable individual databases</p>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <div class="flex items-center gap-sm">
+                                <div class="db-icon postgres" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>PostgreSQL</h4>
+                                    <p>Transactional data store</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-postgresql" checked
+                                onchange="Settings.toggleDatabase('postgresql', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <div class="flex items-center gap-sm">
+                                <div class="db-icon mongodb" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                        <path
+                                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>MongoDB</h4>
+                                    <p>Document store</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-mongodb" checked
+                                onchange="Settings.toggleDatabase('mongodb', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <div class="flex items-center gap-sm">
+                                <div class="db-icon redis" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Redis</h4>
+                                    <p>Cache layer</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-redis" checked
+                                onchange="Settings.toggleDatabase('redis', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <div class="flex items-center gap-sm">
+                                <div class="db-icon neo4j" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                        <circle cx="12" cy="12" r="3" />
+                                        <circle cx="6" cy="6" r="2" />
+                                        <circle cx="18" cy="18" r="2" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4>Neo4j</h4>
+                                    <p>Graph database</p>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-neo4j" checked
+                                onchange="Settings.toggleDatabase('neo4j', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <h2 class="settings-section-title">Notifications</h2>
+                        <p class="settings-section-description">Configure alert and notification preferences</p>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Email Notifications</h4>
+                            <p>Receive critical alerts via email</p>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-email" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Browser Notifications</h4>
+                            <p>Show desktop notifications for alerts</p>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="toggle-browser">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Slack Integration</h4>
+                            <p>Send alerts to Slack channel</p>
+                        </div>
+                        <button class="btn btn-secondary">Configure</button>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="settings-section">
+                    <div class="settings-section-header">
+                        <h2 class="settings-section-title">System Information</h2>
+                        <p class="settings-section-description">Platform version and status</p>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Platform Version</h4>
+                            <p>PolyStoreX</p>
+                        </div>
+                        <span class="badge badge-info">v2.0.0</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>API Endpoint</h4>
+                            <p class="font-mono text-xs">https://api.polystorex.io/v2</p>
+                        </div>
+                        <span class="badge badge-success">Connected</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <h4>Data Region</h4>
+                            <p>US East (Virginia)</p>
+                        </div>
+                        <button class="btn btn-ghost btn-sm">Change</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+
+</html>

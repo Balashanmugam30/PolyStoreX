@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolyStoreX 2.0 Databases - Database status and health monitoring">
+    <title>Databases | PolyStoreX 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Databases</h1>
+                <p>Monitor database status, health, and synchronization</p>
+            </header>
+
+            <div class="page-content">
+                <!-- Database Cards Grid -->
+                <div class="grid grid-2" id="database-grid">
+                    <!-- PostgreSQL -->
+                    <div class="card db-card" data-db="postgresql">
+                        <div class="db-card-header">
+                            <div class="db-icon postgres">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                                </svg>
+                            </div>
+                            <div class="db-info">
+                                <h3>PostgreSQL</h3>
+                                <p class="text-muted">Relational Database</p>
+                            </div>
+                            <div class="db-status">
+                                <span class="badge badge-success" id="pg-status">
+                                    <span class="status-dot healthy"></span>
+                                    Healthy
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted mb-md">Primary store for transactional data, financial records, and
+                            ACID-compliant operations.</p>
+                        <div class="db-stats">
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="pg-connections">24</div>
+                                <div class="db-stat-label">Connections</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="pg-queries">1.2K</div>
+                                <div class="db-stat-label">Queries/min</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="pg-latency">8ms</div>
+                                <div class="db-stat-label">Avg Latency</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="pg-sync">2m ago</div>
+                                <div class="db-stat-label">Last Sync</div>
+                            </div>
+                        </div>
+                        <div class="card-footer flex justify-between items-center">
+                            <span class="text-xs text-muted">Simulate failure</span>
+                            <label class="toggle">
+                                <input type="checkbox" onchange="Databases.toggleStatus('postgresql', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- MongoDB -->
+                    <div class="card db-card" data-db="mongodb">
+                        <div class="db-card-header">
+                            <div class="db-icon mongodb">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                            </div>
+                            <div class="db-info">
+                                <h3>MongoDB</h3>
+                                <p class="text-muted">Document Database</p>
+                            </div>
+                            <div class="db-status">
+                                <span class="badge badge-success" id="mongo-status">
+                                    <span class="status-dot healthy"></span>
+                                    Healthy
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted mb-md">Flexible document storage for user profiles, content, and
+                            semi-structured data.</p>
+                        <div class="db-stats">
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="mongo-connections">18</div>
+                                <div class="db-stat-label">Connections</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="mongo-queries">856</div>
+                                <div class="db-stat-label">Queries/min</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="mongo-latency">12ms</div>
+                                <div class="db-stat-label">Avg Latency</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="mongo-sync">1m ago</div>
+                                <div class="db-stat-label">Last Sync</div>
+                            </div>
+                        </div>
+                        <div class="card-footer flex justify-between items-center">
+                            <span class="text-xs text-muted">Simulate failure</span>
+                            <label class="toggle">
+                                <input type="checkbox" onchange="Databases.toggleStatus('mongodb', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Redis -->
+                    <div class="card db-card" data-db="redis">
+                        <div class="db-card-header">
+                            <div class="db-icon redis">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                                </svg>
+                            </div>
+                            <div class="db-info">
+                                <h3>Redis</h3>
+                                <p class="text-muted">Cache & Session Store</p>
+                            </div>
+                            <div class="db-status">
+                                <span class="badge badge-success" id="redis-status">
+                                    <span class="status-dot healthy"></span>
+                                    Healthy
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted mb-md">High-speed caching layer for session management, rate
+                            limiting, and real-time data.</p>
+                        <div class="db-stats">
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="redis-connections">42</div>
+                                <div class="db-stat-label">Connections</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="redis-queries">5.4K</div>
+                                <div class="db-stat-label">Ops/min</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="redis-latency">0.8ms</div>
+                                <div class="db-stat-label">Avg Latency</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="redis-hit">94.2%</div>
+                                <div class="db-stat-label">Hit Ratio</div>
+                            </div>
+                        </div>
+                        <div class="card-footer flex justify-between items-center">
+                            <span class="text-xs text-muted">Simulate failure</span>
+                            <label class="toggle">
+                                <input type="checkbox" onchange="Databases.toggleStatus('redis', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Neo4j -->
+                    <div class="card db-card" data-db="neo4j">
+                        <div class="db-card-header">
+                            <div class="db-icon neo4j">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <circle cx="6" cy="6" r="2" />
+                                    <circle cx="18" cy="6" r="2" />
+                                    <circle cx="6" cy="18" r="2" />
+                                    <circle cx="18" cy="18" r="2" />
+                                    <line x1="9" y1="9" x2="7" y2="7" stroke="currentColor" stroke-width="1.5" />
+                                    <line x1="15" y1="9" x2="17" y2="7" stroke="currentColor" stroke-width="1.5" />
+                                    <line x1="9" y1="15" x2="7" y2="17" stroke="currentColor" stroke-width="1.5" />
+                                    <line x1="15" y1="15" x2="17" y2="17" stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                            </div>
+                            <div class="db-info">
+                                <h3>Neo4j</h3>
+                                <p class="text-muted">Graph Database</p>
+                            </div>
+                            <div class="db-status">
+                                <span class="badge badge-success" id="neo4j-status">
+                                    <span class="status-dot healthy"></span>
+                                    Healthy
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-muted mb-md">Graph-based storage for relationships, recommendations, and
+                            network analysis.</p>
+                        <div class="db-stats">
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="neo4j-connections">8</div>
+                                <div class="db-stat-label">Connections</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="neo4j-queries">234</div>
+                                <div class="db-stat-label">Queries/min</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="neo4j-latency">18ms</div>
+                                <div class="db-stat-label">Avg Latency</div>
+                            </div>
+                            <div class="db-stat">
+                                <div class="db-stat-value" id="neo4j-nodes">1.2M</div>
+                                <div class="db-stat-label">Total Nodes</div>
+                            </div>
+                        </div>
+                        <div class="card-footer flex justify-between items-center">
+                            <span class="text-xs text-muted">Simulate failure</span>
+                            <label class="toggle">
+                                <input type="checkbox" onchange="Databases.toggleStatus('neo4j', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sync Status Panel -->
+                <div class="card mt-xl">
+                    <div class="card-header">
+                        <span class="card-title">Cross-Database Synchronization</span>
+                        <span class="badge badge-success">All Synced</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Lag</th>
+                                    <th>Last Sync</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sync-table">
+                                <tr>
+                                    <td>PostgreSQL</td>
+                                    <td>MongoDB</td>
+                                    <td><span class="badge badge-success">Synced</span></td>
+                                    <td>0ms</td>
+                                    <td>Just now</td>
+                                </tr>
+                                <tr>
+                                    <td>PostgreSQL</td>
+                                    <td>Redis</td>
+                                    <td><span class="badge badge-success">Synced</span></td>
+                                    <td>0ms</td>
+                                    <td>Just now</td>
+                                </tr>
+                                <tr>
+                                    <td>MongoDB</td>
+                                    <td>Neo4j</td>
+                                    <td><span class="badge badge-success">Synced</span></td>
+                                    <td>2ms</td>
+                                    <td>1 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td>Redis</td>
+                                    <td>PostgreSQL</td>
+                                    <td><span class="badge badge-info">Pending</span></td>
+                                    <td>--</td>
+                                    <td>Scheduled</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/databases.js"></script>
+</body>
+
+</html>

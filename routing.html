@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolyStoreX 2.0 Data Routing - Intelligent data routing and orchestration">
+    <title>Data Routing | PolyStoreX 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Data Routing</h1>
+                <p>Intelligent orchestration and policy-based routing decisions</p>
+            </header>
+
+            <div class="page-content">
+                <div class="routing-container">
+                    <!-- Routing Diagram -->
+                    <div class="routing-diagram">
+                        <svg id="routing-svg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Paths (drawn first so they appear behind nodes) -->
+                            <g id="routing-paths">
+                                <!-- Central to PostgreSQL -->
+                                <path class="routing-path" id="path-pg" d="M300,250 L150,120" />
+                                <!-- Central to MongoDB -->
+                                <path class="routing-path" id="path-mongo" d="M300,250 L450,120" />
+                                <!-- Central to Redis -->
+                                <path class="routing-path" id="path-redis" d="M300,250 L150,380" />
+                                <!-- Central to Neo4j -->
+                                <path class="routing-path" id="path-neo4j" d="M300,250 L450,380" />
+                            </g>
+
+                            <!-- Central Orchestrator Node -->
+                            <g class="routing-node-group" id="node-orchestrator"
+                                onclick="Routing.selectNode('orchestrator')">
+                                <circle class="routing-node active" cx="300" cy="250" r="45" />
+                                <text class="routing-label" x="300" y="245">Poly</text>
+                                <text class="routing-label" x="300" y="262" font-size="10">Orchestrator</text>
+                            </g>
+
+                            <!-- PostgreSQL Node -->
+                            <g class="routing-node-group" id="node-postgresql"
+                                onclick="Routing.selectNode('postgresql')">
+                                <rect class="routing-node" x="100" y="80" width="100" height="80" rx="8" />
+                                <text class="routing-label" x="150" y="115">PostgreSQL</text>
+                                <text class="routing-label text-muted" x="150" y="135"
+                                    font-size="10">Transactions</text>
+                                <circle id="status-pg" cx="180" cy="95" r="6" fill="#22c55e" />
+                            </g>
+
+                            <!-- MongoDB Node -->
+                            <g class="routing-node-group" id="node-mongodb" onclick="Routing.selectNode('mongodb')">
+                                <rect class="routing-node" x="400" y="80" width="100" height="80" rx="8" />
+                                <text class="routing-label" x="450" y="115">MongoDB</text>
+                                <text class="routing-label text-muted" x="450" y="135" font-size="10">Documents</text>
+                                <circle id="status-mongo" cx="480" cy="95" r="6" fill="#22c55e" />
+                            </g>
+
+                            <!-- Redis Node -->
+                            <g class="routing-node-group" id="node-redis" onclick="Routing.selectNode('redis')">
+                                <rect class="routing-node" x="100" y="340" width="100" height="80" rx="8" />
+                                <text class="routing-label" x="150" y="375">Redis</text>
+                                <text class="routing-label text-muted" x="150" y="395" font-size="10">Cache</text>
+                                <circle id="status-redis" cx="180" cy="355" r="6" fill="#22c55e" />
+                            </g>
+
+                            <!-- Neo4j Node -->
+                            <g class="routing-node-group" id="node-neo4j" onclick="Routing.selectNode('neo4j')">
+                                <rect class="routing-node" x="400" y="340" width="100" height="80" rx="8" />
+                                <text class="routing-label" x="450" y="375">Neo4j</text>
+                                <text class="routing-label text-muted" x="450" y="395" font-size="10">Graphs</text>
+                                <circle id="status-neo4j" cx="480" cy="355" r="6" fill="#22c55e" />
+                            </g>
+
+                            <!-- Incoming Request Arrow -->
+                            <g id="incoming-request">
+                                <path d="M300,50 L300,195" stroke="var(--accent-blue)" stroke-width="2"
+                                    stroke-dasharray="5,5" fill="none" />
+                                <polygon points="295,195 300,205 305,195" fill="var(--accent-blue)" />
+                                <text x="300" y="40" text-anchor="middle" fill="var(--text-muted)"
+                                    font-size="11">Incoming Request</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- Routing Details Panel -->
+                    <div class="routing-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title" id="panel-title">Routing Details</h3>
+                        </div>
+                        <div class="panel-body" id="routing-details">
+                            <p class="text-muted text-sm">Select a node to view routing details</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Routing Rules Table -->
+                <div class="card mt-xl">
+                    <div class="card-header">
+                        <span class="card-title">Active Routing Rules</span>
+                        <button class="btn btn-sm btn-secondary" onclick="Routing.simulateRequest()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            Simulate Request
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Priority</th>
+                                    <th>Data Type</th>
+                                    <th>Target Database</th>
+                                    <th>Condition</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rules-table">
+                                <tr>
+                                    <td><span class="badge badge-info">1</span></td>
+                                    <td>Financial Transaction</td>
+                                    <td>PostgreSQL</td>
+                                    <td>ACID required = true</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">2</span></td>
+                                    <td>User Profile</td>
+                                    <td>MongoDB</td>
+                                    <td>Schema flexibility required</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">3</span></td>
+                                    <td>Session Data</td>
+                                    <td>Redis</td>
+                                    <td>TTL < 24h AND read_heavy=true</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">4</span></td>
+                                    <td>Relationship Data</td>
+                                    <td>Neo4j</td>
+                                    <td>has_relationships = true</td>
+                                    <td><span class="badge badge-success">Active</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-neutral">5</span></td>
+                                    <td>Default</td>
+                                    <td>PostgreSQL</td>
+                                    <td>Fallback rule</td>
+                                    <td><span class="badge badge-neutral">Fallback</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Routing Decisions -->
+                <div class="card mt-lg">
+                    <div class="card-header">
+                        <span class="card-title">Recent Routing Decisions</span>
+                    </div>
+                    <div class="transaction-log" id="routing-log">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/routing.js"></script>
+</body>
+
+</html>

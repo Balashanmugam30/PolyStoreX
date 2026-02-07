@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolyStoreX 2.0 Transactions - Cross-database transaction management">
+    <title>Transactions | PolyStoreX 2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1>Cross-Database Transactions</h1>
+                        <p>Distributed transaction management with SAGA pattern</p>
+                    </div>
+                    <div class="flex gap-sm">
+                        <button class="btn btn-secondary" onclick="Transactions.reset()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                            Reset
+                        </button>
+                        <button class="btn btn-primary" id="run-btn" onclick="Transactions.runTransaction()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            Run Transaction
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="grid grid-2">
+                    <!-- Transaction Flow -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Transaction Pipeline</span>
+                            <span class="badge badge-neutral" id="tx-status">Ready</span>
+                        </div>
+                        <div class="transaction-flow" id="transaction-flow">
+                            <!-- Step 1: Validate -->
+                            <div class="transaction-step" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Validate Request</div>
+                                    <div class="step-description">Schema validation and authentication check</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Begin -->
+                            <div class="transaction-step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Begin Transaction</div>
+                                    <div class="step-description">Initialize distributed transaction context</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: PostgreSQL -->
+                            <div class="transaction-step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Execute PostgreSQL</div>
+                                    <div class="step-description">Insert financial record with ACID guarantees</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: MongoDB -->
+                            <div class="transaction-step" data-step="4">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">Update MongoDB</div>
+                                    <div class="step-description">Store document metadata and references</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 5: Redis -->
+                            <div class="transaction-step" data-step="5">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <div class="step-title">Invalidate Cache</div>
+                                    <div class="step-description">Clear related Redis cache entries</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 6: Neo4j -->
+                            <div class="transaction-step" data-step="6">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <div class="step-title">Update Graph</div>
+                                    <div class="step-description">Create/update Neo4j relationship nodes</div>
+                                </div>
+                            </div>
+
+                            <!-- Step 7: Commit -->
+                            <div class="transaction-step" data-step="7">
+                                <div class="step-number">7</div>
+                                <div class="step-content">
+                                    <div class="step-title">Commit Transaction</div>
+                                    <div class="step-description">Finalize all database operations</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Failure Simulation -->
+                        <div class="card-footer">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="text-xs text-muted">Simulate failure at step:</span>
+                                    <select id="fail-step" class="form-input"
+                                        style="width: auto; display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.5rem;">
+                                        <option value="0">None</option>
+                                        <option value="3">Step 3 (PostgreSQL)</option>
+                                        <option value="4">Step 4 (MongoDB)</option>
+                                        <option value="5">Step 5 (Redis)</option>
+                                        <option value="6">Step 6 (Neo4j)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Logs -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Transaction Logs</span>
+                            <button class="btn btn-sm btn-ghost" onclick="Transactions.clearLogs()">Clear</button>
+                        </div>
+                        <div class="transaction-log" id="transaction-log">
+                            <div class="log-entry">
+                                <span class="log-time">--:--:--</span>
+                                <span class="log-level info">INFO</span>
+                                <span class="log-message">Waiting for transaction...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="card mt-xl">
+                    <div class="card-header">
+                        <span class="card-title">Transaction History</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Type</th>
+                                    <th>Databases</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table">
+                                <tr>
+                                    <td class="font-mono text-xs">tx_8f7e6d5c4b3a</td>
+                                    <td>Cross-DB Write</td>
+                                    <td>
+                                        <span class="badge badge-info">PG</span>
+                                        <span class="badge badge-info">Mongo</span>
+                                        <span class="badge badge-info">Redis</span>
+                                    </td>
+                                    <td>124ms</td>
+                                    <td><span class="badge badge-success">Committed</span></td>
+                                    <td class="text-muted">2 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono text-xs">tx_2a3b4c5d6e7f</td>
+                                    <td>SAGA Pattern</td>
+                                    <td>
+                                        <span class="badge badge-info">PG</span>
+                                        <span class="badge badge-info">Neo4j</span>
+                                    </td>
+                                    <td>89ms</td>
+                                    <td><span class="badge badge-success">Committed</span></td>
+                                    <td class="text-muted">5 min ago</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-mono text-xs">tx_9c8b7a6f5e4d</td>
+                                    <td>Cross-DB Write</td>
+                                    <td>
+                                        <span class="badge badge-info">PG</span>
+                                        <span class="badge badge-info">Mongo</span>
+                                        <span class="badge badge-info">Redis</span>
+                                        <span class="badge badge-info">Neo4j</span>
+                                    </td>
+                                    <td>--</td>
+                                    <td><span class="badge badge-error">Rolled Back</span></td>
+                                    <td class="text-muted">12 min ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/transactions.js"></script>
+</body>
+
+</html>
