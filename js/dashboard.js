@@ -202,7 +202,7 @@ window.addEventListener('beforeunload', () => {
 window.Dashboard = Dashboard;
 
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://polystorex.onrender.com";
 
 async function sendDataToBackend() {
     const input = document.getElementById("jsonInput");
